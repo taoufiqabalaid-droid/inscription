@@ -962,7 +962,7 @@ function isValidYear(year) {
 }
 
 function isValidPhone(phone) {
-    return /^[+0-9\s\-()]{8,}$/.test(phone);
+    return /^[0-9+() -]{8,20}$/.test(phone);
 }
 
 // Gestion de la soumission du formulaire
@@ -985,9 +985,30 @@ form.addEventListener('submit', function(e) {
         const data = Object.fromEntries(formData);
         
         // Simuler un délai de traitement
-        setTimeout(() => {
-            showSuccessModal(data);
-        }, 1500);
+        fetch('https://zapier.com/app/assets/zaps?owners=27891153', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+})
+.then(response => {
+    if (response.ok) {
+        showSuccessModal(data);
+    } else {
+        messageManager.error(
+            'Erreur',
+            'Impossible d’envoyer les données à Zapier.'
+        );
+    }
+})
+.catch(error => {
+    console.error(error);
+    messageManager.error(
+        'Erreur de connexion',
+        'Échec de la communication avec Zapier.'
+    );
+});
         
     } else {
         // Afficher les erreurs

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- saved from =(0059)file:///C:/Users/TAOUFIQ/Downloads/inscription-success.html -->
+<!-- ISPITSM Marrakech -->
 <html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISPITSM Marrakech - Inscription &amp; Réinscription</title>
+<title>ISPITS Marrakech - Inscription &amp; Réinscription</title>
 
 <style>
 * {
@@ -979,10 +979,54 @@ form.addEventListener('submit', function(e) {
         const data = Object.fromEntries(formData);
         
         // Simuler un délai de traitement
-        setTimeout(() => {
-            showSuccessModal(data);
-        }, 1500);
-        
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Aknt2qujSdr0t8f7QJLm85JRcXPPlUIJD40tqRQBGRkvVYn9dVKNxLMLHlBKwrTC_Q/exec";
+
+form.addEventListener("submit", function(e){
+
+```
+e.preventDefault();
+
+const validation = validateForm();
+
+if(!validation.isValid){
+    return;
+}
+
+const data = Object.fromEntries(
+    new FormData(form)
+);
+
+fetch(SCRIPT_URL,{
+    method:"POST",
+    body:new URLSearchParams(data)
+})
+.then(res=>res.json())
+.then(result=>{
+
+    if(result.status==="success"){
+
+        showSuccessModal(data);
+
+    }else{
+
+        throw new Error(result.message);
+
+    }
+
+})
+.catch(error=>{
+
+    console.error(error);
+
+    messageManager.error(
+        "Erreur",
+        "Impossible d'enregistrer les données."
+    );
+
+});
+```
+
+});
     } else {
         // Afficher les erreurs
         const errorDetails = validation.errors.map(err => `• ${err}`).join('<br>');
@@ -1187,12 +1231,18 @@ Type d'Inscription: ${inscription.type === 'inscription' ? 'Première inscriptio
         `;
         
         const blob = new Blob([content], { type: 'text/plain' });
-        const  = window..createObject(blob);
-        const a = document.createElement('a');
-        a.href = ;
-        a.download = `inscription-${inscription.numeroReference}.txt`;
-        a.click();
-        window..revokeObject();
+
+const url = window.URL.createObjectURL(blob);
+
+const a = document.createElement('a');
+a.href = url;
+a.download = `inscription-${inscription.numeroReference}.txt`;
+
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+
+window.URL.revokeObjectURL(url);
     }
 }
 

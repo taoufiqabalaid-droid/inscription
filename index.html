@@ -1037,49 +1037,69 @@ form.addEventListener("submit", async function(e) {
         const data = Object.fromEntries(formData);
         
         // Simuler un délai de traitement
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Aknt2qujSdr0t8f7QJLm85JRcXPPlUIJD40tqRQBGRkvVYn9dVKNxLMLHlBKwrTC_Q/exec";
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Aknt2qujSdr0t8f7QJLm85JRcXPPlUIJD40tqRQBGRkvVYn9dVKNxLMLHlBKwrTC_Q/exec";
 
-form.addEventListener("submit", function(e){
+form.addEventListener("submit", async function(e) {
 
-```
-e.preventDefault();
+    e.preventDefault();
 
-const validation = validateForm();
+    form.querySelectorAll('.form-group').forEach(group => {
+        group.classList.remove('error');
+    });
 
-if(!validation.isValid){
-    return;
-}
+    const validation = validateForm();
 
-const data = Object.fromEntries(
-    new FormData(form)
-);
+    if (!validation.isValid) {
 
-fetch(SCRIPT_URL,{
-    method:"POST",
-    body:new URLSearchParams(data)
-})
-.then(res=>res.json())
-.then(result=>{
+        const errorDetails = validation.errors.map(err => `• ${err}`).join('<br>');
 
-    if(result.status==="success"){
+        messageManager.error(
+            '❌ Erreurs de Validation',
+            'Veuillez corriger les erreurs avant de soumettre le formulaire.',
+            errorDetails
+        );
 
-        showSuccessModal(data);
-
-    }else{
-
-        throw new Error(result.message);
-
+        return;
     }
 
-})
-.catch(error=>{
-
-    console.error(error);
-
-    messageManager.error(
-        "Erreur",
-        "Impossible d'enregistrer les données."
+    const data = Object.fromEntries(
+        new FormData(form)
     );
+
+    try {
+
+        messageManager.info(
+            "⏳ Enregistrement",
+            "Veuillez patienter..."
+        );
+
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: new URLSearchParams(data)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+
+            showSuccessModal(data);
+
+        } else {
+
+            throw new Error(result.message || "Erreur serveur");
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        messageManager.error(
+            "❌ Erreur",
+            "Impossible d'enregistrer les données dans Google Sheets."
+        );
+
+    }
 
 });
 ```

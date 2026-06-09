@@ -979,9 +979,28 @@ form.addEventListener('submit', function(e) {
         const data = Object.fromEntries(formData);
         
         // Simuler un délai de traitement
-        setTimeout(() => {
-            showSuccessModal(data);
-        }, 1500);
+        fetch(SCRIPT_URL, {
+    method: "POST",
+    body: new URLSearchParams(data)
+})
+.then(response => response.json())
+.then(result => {
+
+    if(result.status === "success"){
+        showSuccessModal(data);
+    } else {
+        throw new Error();
+    }
+
+})
+.catch(error => {
+
+    messageManager.error(
+        "Erreur",
+        "L'enregistrement dans Google Sheets a échoué."
+    );
+
+});
         
     } else {
         // Afficher les erreurs
@@ -1073,6 +1092,7 @@ function saveInscriptionData(data, refNumber) {
         dateInscription: new Date().toLocaleString('fr-FR'),
         numeroReference: refNumber
     };
+    showSuccessModal(data);
     localStorage.setItem('derniere-inscription', JSON.stringify(inscription));
 }
 
@@ -1202,18 +1222,22 @@ function launchConfetti() {
     const colors = ['#28a745', '#006699', '#ffc107', '#17a2b8', '#dc3545'];
     
     for (let i = 0; i < confettiCount; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * window.innerWidth + 'px';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animation = `confetti-fall ${2 + Math.random() * 1}s ease-in forwards`;
-            document.body.appendChild(confetti);
-            
-            setTimeout(() => confetti.remove(), 3000);
-        }, i * 30);
-    }
-}
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxcwx-G_s8ogAL-Se1dQb5D78OOXTKfbtfjlV1cDvD5I6FOb3zAcrFkd8Ri-nlZ2gmpw/exec";
+
+fetch(SCRIPT_URL, {
+    method: "POST",
+    body: new URLSearchParams(data)
+})
+.then(response => response.json())
+.then(result => {
+    showSuccessModal(data);
+})
+.catch(error => {
+    messageManager.error(
+        "Erreur",
+        "Impossible d'enregistrer les données dans Google Sheets"
+    );
+});
 
 // Validation en temps réel
 form.querySelectorAll('input, select, textarea').forEach(field => {

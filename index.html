@@ -987,21 +987,26 @@ form.addEventListener('submit', function(e) {
         // Simuler un délai de traitement
         fetch('https://script.google.com/macros/s/AKfycbw8oGpabQSvVQdYrLj84kLx-B0b1sL3FYbHgagYOU0IQiZ_A2GVIurhpQ92IEwmQoJrEw/exec', {
     method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
     body: JSON.stringify(data)
 })
-.then(response => {
-    if (response.ok) {
+.then(response => response.json())
+.then(result => {
+    if (result.success) {
         showSuccessModal(data);
     } else {
         messageManager.error(
             'Erreur',
-            'Impossible d’envoyer les données à Zapier.'
+            'Échec de l’enregistrement dans Google Sheets.'
         );
     }
 })
+.catch(error => {
+    console.error(error);
+    messageManager.error(
+        'Erreur',
+        'Impossible de contacter Google Sheets.'
+    );
+});
 .catch(error => {
     console.error(error);
     messageManager.error(

@@ -662,18 +662,12 @@ footer {
         </div>
     </div>
 
-   <div class="form-group">
-    <label for="telephone">Téléphone</label>
-    <input
-        type="tel"
-        id="telephone"
-        name="telephone"
-        placeholder="Exemple: +212612345678"
-        pattern="^\+?[0-9]{8,15}$">
-    <span class="error-message">
-        Veuillez entrer un numéro de téléphone valide
-    </span>
-</div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="telephone">Téléphone</label>
+            <input type="tel" id="telephone" name="telephone" placeholder="Exemple: +212612345678" pattern="[+0-9\s\-()]{8,}">
+            <span class="error-message">Veuillez entrer un numéro de téléphone valide</span>
+        </div>
 
         <div class="form-group">
             <label for="adresse">Adresse</label>
@@ -962,7 +956,7 @@ function isValidYear(year) {
 }
 
 function isValidPhone(phone) {
-    return /^[0-9+() -]{8,20}$/.test(phone);
+    return /^[+0-9\s\-()]{8,}$/.test(phone);
 }
 
 // Gestion de la soumission du formulaire
@@ -985,35 +979,9 @@ form.addEventListener('submit', function(e) {
         const data = Object.fromEntries(formData);
         
         // Simuler un délai de traitement
-        fetch('https://script.google.com/macros/s/AKfycbw8oGpabQSvVQdYrLj84kLx-B0b1sL3FYbHgagYOU0IQiZ_A2GVIurhpQ92IEwmQoJrEw/exeC', {
-    method: 'POST',
-    body: JSON.stringify(data)
-})
-.then(response => response.json())
-.then(result => {
-    if (result.success) {
-        showSuccessModal(data);
-    } else {
-        messageManager.error(
-            'Erreur',
-            'Échec de l’enregistrement dans Google Sheets.'
-        );
-    }
-})
-.catch(error => {
-    console.error(error);
-    messageManager.error(
-        'Erreur',
-        'Impossible de contacter Google Sheets.'
-    );
-});
-.catch(error => {
-    console.error(error);
-    messageManager.error(
-        'Erreur de connexion',
-        'Échec de la communication avec Zapier.'
-    );
-});
+        setTimeout(() => {
+            showSuccessModal(data);
+        }, 1500);
         
     } else {
         // Afficher les erreurs

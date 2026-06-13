@@ -648,39 +648,34 @@ footer {
         </div>
     </div>
 
-   <div class="form-row">
-    <div class="form-group">
-        <label for="nationalite" class="required">Nationalité</label>
-        <input type="text" id="nationalite" name="nationalite" required
-               placeholder="Votre nationalité">
-        <span class="error-message">La nationalité est obligatoire</span>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="nationalite" class="required">Nationalité</label>
+            <input type="text" id="nationalite" name="nationalite" required="" placeholder="Exemple: Marocain(e)">
+            <span class="error-message">La nationalité est obligatoire</span>
+        </div>
+
+        <div class="form-group">
+            <label for="email" class="required">Email</label>
+            <input type="email" id="email" name="email" required="" placeholder="exemple@email.com">
+            <span class="error-message">Veuillez entrer une adresse email valide</span>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="email" class="required">Email</label>
-        <input type="email" id="email" name="email" required
-               placeholder="exemple@email.com">
-        <span class="error-message">Veuillez entrer une adresse email valide</span>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="telephone">Téléphone</label>
+            <input type="tel" id="telephone" name="telephone" placeholder="Exemple: +212612345678" pattern="[+0-9\s\-()]{8,}">
+            <span class="error-message">Veuillez entrer un numéro de téléphone valide</span>
+        </div>
+
+        <div class="form-group">
+            <label for="adresse">Adresse</label>
+            <input type="text" id="adresse" name="adresse" placeholder="Votre adresse complète">
+        </div>
     </div>
 </div>
 
-  <div class="form-row">
-    <div class="form-group">
-        <label for="telephone" class="required">Téléphone</label>
-        <input type="tel" id="telephone" name="telephone" required
-               placeholder="Exemple: +212612345678"
-               pattern="[+0-9\s\-()]{8,}">
-        <span class="error-message">Le téléphone est obligatoire</span>
-    </div>
-
-    <div class="form-group">
-        <label for="adresse" class="required">Adresse</label>
-        <input type="text" id="adresse" name="adresse" required
-               placeholder="Votre adresse complète">
-        <span class="error-message">L'adresse est obligatoire</span>
-    </div>
-</div>
-    
 <!-- Section Informations Académiques -->
 <div class="section">
     <div class="section-subtitle">🎓 Informations Académiques</div>
@@ -765,13 +760,12 @@ footer {
 
     <div class="form-row full">
         <div class="form-group">
-    <label for="modules" class="required">Modules suivis</label>
-    <textarea id="modules" name="modules" rows="3" required
-              placeholder="Exemple: Anatomie, Physiologie, Pharmacologie"></textarea>
-    <span class="error-message">Les modules sont obligatoires</span>
+            <label for="modules">Modules suivis (séparés par des virgules)</label>
+            <textarea id="modules" name="modules" rows="3" placeholder="Exemple: Anatomie, Physiologie, Pharmacologie"></textarea>
+        </div>
+    </div>
 </div>
-</div>
-</div>
+
 <!-- Boutons d'action -->
 <div class="button-group">
     <button type="submit" class="btn-submit">✓ Valider l'inscription</button>
@@ -1104,7 +1098,6 @@ function printInscription() {
                     .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }
                 </style>
             </head>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
             <body>
                 <div class="header">
                     <h1>ISPITSM Marrakech</h1>
@@ -1175,19 +1168,19 @@ DATE D'INSCRIPTION: ${inscription.dateInscription}
 INFORMATIONS PERSONNELLES
 ==================================================
 Nom: ${inscription.nom}
-Prenom: ${inscription.prenom}
+Prénom: ${inscription.prenom}
 Email: ${inscription.email}
-Telephone: ${inscription.telephone || 'N/A'}
+Téléphone: ${inscription.telephone || 'N/A'}
 CNI: ${inscription.cni}
-Nationalite: ${inscription.nationalite}
+Nationalité: ${inscription.nationalite}
 
-INFORMATIONS ACADEMIQUES
+INFORMATIONS ACADÉMIQUES
 ==================================================
-Filiere: ${getFiliereName(inscription.filiere)}
+Filière: ${getFiliereName(inscription.filiere)}
 Option: ${inscription.option}
 Semestre: ${inscription.semestre}
-Annee Universitaire: ${inscription.anneeUniversitaire}
-Type d'Inscription: ${inscription.type === 'inscription' ? 'inscription' : 'Réinscription'}
+Année Universitaire: ${inscription.anneeUniversitaire}
+Type d'Inscription: ${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}
 
 ==================================================
 © 2025-2026 ISPITSM Marrakech

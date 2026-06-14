@@ -1025,14 +1025,12 @@ function showSuccessModal(data) {
             <span class="modal-detail-label">📚 Semestre:</span>
             <span class="modal-detail-value">${data.semestre}</span>
         </div>
-       <div class="detail-row">
-        <span>Type:</span><div class="modal-detail-item">
-        <span class="modal-detail-label">📝 Type :</span>
-        <span class="modal-detail-value">
+      <div class="modal-detail-item">
+    <span class="modal-detail-label">📝 Type :</span>
+    <span class="modal-detail-value">
         ${data.type === 'inscription' ? 'Première inscription' : 'Réinscription'}
     </span>
 </div>
-        </div>
         <div class="modal-detail-item">
             <span class="modal-detail-label">✉️ Email:</span>
             <span class="modal-detail-value">${data.email}</span>
@@ -1154,7 +1152,7 @@ function printInscription() {
                     </div>
                     <div class="detail-row">
                         <span>Type:</span>
-                        ${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}
+                        <span>${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}</span>
                     </div>
                     <div class="detail-row">
                     <span>Modules :</span>

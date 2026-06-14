@@ -761,7 +761,13 @@ footer {
     <div class="form-row full">
         <div class="form-group">
             <label for="modules">Modules suivis (séparés par des virgules)</label>
-            <textarea id="modules" name="modules" rows="3"placeholder="Exemple: Anatomie, Physiologie, Pharmacologie"required></textarea>
+            <textarea
+    id="modules"
+    name="modules"
+    rows="3"
+    placeholder="Exemple: Anatomie, Physiologie, Pharmacologie"
+    required
+></textarea>
         </div>
     </div>
 </div>
@@ -1019,9 +1025,9 @@ function showSuccessModal(data) {
             <span class="modal-detail-label">📚 Semestre:</span>
             <span class="modal-detail-value">${data.semestre}</span>
         </div>
-        <div class="modal-detail-item">
-            <span class="modal-detail-label">📝 Type:</span>
-            <span class="modal-detail-value">${data.type === 'inscription' ? 'Première inscription' : 'Réinscription'}</span>
+       <div class="detail-row">
+        <span>Type:</span>
+        <span>${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}</span>
         </div>
         <div class="modal-detail-item">
             <span class="modal-detail-label">✉️ Email:</span>

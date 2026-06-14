@@ -1143,8 +1143,7 @@ function printInscription() {
                         <span>${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}</span>
                     </div>
                 </div>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-</body>
+            </body>
             </html>
         `;
         
@@ -1155,74 +1154,47 @@ function printInscription() {
     }
 }
 
-async function downloadInscription() {
+function downloadInscription() {
     const inscription = JSON.parse(localStorage.getItem('derniere-inscription'));
+    if (inscription) {
+        const content = `
+CONFIRMATION D'INSCRIPTION
+ISPITSM Marrakech
+==================================================
 
-    if (!inscription) {
-        alert("Aucune inscription trouvée.");
-        return;
+NUMÉRO DE RÉFÉRENCE: #INS-${inscription.numeroReference}
+DATE D'INSCRIPTION: ${inscription.dateInscription}
+
+INFORMATIONS PERSONNELLES
+==================================================
+Nom: ${inscription.nom}
+Prénom: ${inscription.prenom}
+Email: ${inscription.email}
+Téléphone: ${inscription.telephone || 'N/A'}
+CNI: ${inscription.cni}
+Nationalité: ${inscription.nationalite}
+
+INFORMATIONS ACADÉMIQUES
+==================================================
+Filière: ${getFiliereName(inscription.filiere)}
+Option: ${inscription.option}
+Semestre: ${inscription.semestre}
+Année Universitaire: ${inscription.anneeUniversitaire}
+Type d'Inscription: ${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}
+
+==================================================
+© 2025-2026 ISPITSM Marrakech
+        `;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `inscription-${inscription.numeroReference}.txt`;
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    doc.setFontSize(18);
-    doc.text("ISPITSM Marrakech", 20, 20);
-
-    doc.setFontSize(14);
-    doc.text("Confirmation d'Inscription", 20, 30);
-
-    doc.setFontSize(11);
-
-    let y = 50;
-
-    doc.text(`Référence : #INS-${inscription.numeroReference}`, 20, y);
-    y += 10;
-
-    doc.text(`Date : ${inscription.dateInscription}`, 20, y);
-    y += 15;
-
-    doc.text("Informations Personnelles", 20, y);
-    y += 10;
-
-    doc.text(`Nom : ${inscription.nom}`, 20, y);
-    y += 8;
-
-    doc.text(`Prénom : ${inscription.prenom}`, 20, y);
-    y += 8;
-
-    doc.text(`CNI : ${inscription.cni}`, 20, y);
-    y += 8;
-
-    doc.text(`Nationalité : ${inscription.nationalite}`, 20, y);
-    y += 8;
-
-    doc.text(`Email : ${inscription.email}`, 20, y);
-    y += 8;
-
-    doc.text(`Téléphone : ${inscription.telephone || 'N/A'}`, 20, y);
-    y += 15;
-
-    doc.text("Informations Académiques", 20, y);
-    y += 10;
-
-    doc.text(`Filière : ${getFiliereName(inscription.filiere)}`, 20, y);
-    y += 8;
-
-    doc.text(`Option : ${inscription.option}`, 20, y);
-    y += 8;
-
-    doc.text(`Semestre : ${inscription.semestre}`, 20, y);
-    y += 8;
-
-    doc.text(`Année Universitaire : ${inscription.anneeUniversitaire}`, 20, y);
-    y += 8;
-
-    doc.text(`Type : ${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}`, 20, y);
-
-    doc.save(`inscription-${inscription.numeroReference}.pdf`);
 }
-
 
 // Effet Confetti
 function launchConfetti() {
@@ -1280,5 +1252,4 @@ window.addEventListener('load', function() {
 </script>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body></html>

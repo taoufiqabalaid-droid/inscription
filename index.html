@@ -1036,6 +1036,14 @@ function showSuccessModal(data) {
             <span class="modal-detail-value">${data.email}</span>
         </div>
         <div class="modal-detail-item">
+    <span class="modal-detail-label">🎂 Date de naissance :</span>
+    <span class="modal-detail-value">${data.dateNaissance || 'N/A'}</span>
+</div>
+<div class="modal-detail-item">
+    <span class="modal-detail-label">🏠 Adresse :</span>
+    <span class="modal-detail-value">${data.adresse || 'N/A'}</span>
+</div>
+        <div class="modal-detail-item">
             <span class="modal-detail-label">📅 Date:</span>
             <span class="modal-detail-value">${new Date().toLocaleDateString('fr-FR')}</span>
         </div>
@@ -1137,6 +1145,15 @@ function printInscription() {
                         <span>Téléphone:</span>
                         <span>${inscription.telephone || 'N/A'}</span>
                     </div>
+                    <div class="detail-row">
+                        <span>Date de naissance :</span>
+                        <span>${inscription.dateNaissance || 'N/A'}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>Adresse :</span>
+                        <span>${inscription.adresse || 'N/A'}</span>
+                    </div>
                     <h3>Informations Académiques</h3>
                     <div class="detail-row">
                         <span>Filière:</span>
@@ -1187,6 +1204,8 @@ INFORMATIONS PERSONNELLES
 Nom: ${inscription.nom}
 Prénom: ${inscription.prenom}
 Email: ${inscription.email}
+Date de naissance: ${inscription.dateNaissance || 'N/A'}
+Adresse: ${inscription.adresse || 'N/A'}
 Téléphone: ${inscription.telephone || 'N/A'}
 CNI: ${inscription.cni}
 Nationalité: ${inscription.nationalite}

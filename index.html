@@ -1182,7 +1182,7 @@ function printInscription() {
         return;
     }
 
-    const { jsPDF } = window.jspdf;
+    const jsPDF = window.jspdf.jsPDF;
 
     const pdf = new jsPDF({
         orientation: 'portrait',
@@ -1194,24 +1194,39 @@ function printInscription() {
 
     // Cadre A4
     pdf.setDrawColor(0,102,153);
-    pdf.rect(10,10,190,277);
+    pdf.setFillColor(0,102,153);
+    pdf.rect(10,10,190,12,'F');
+
+    pdf.setTextColor(255,255,255);
+    pdf.setFontSize(18);
+    pdf.text("ISPITSM Marrakech",105,18,{align:"center"});
+
+    pdf.setTextColor(0,0,0);
 
     // Titre
-    pdf.setFont("helvetica","bold");
-    pdf.setFontSize(20);
-    pdf.text("ISPITSM Marrakech",105,20,{align:"center"});
-
+  
     y = 30;
 
     pdf.setFontSize(14);
-    pdf.text("Fiche de Validation d'Inscription",105,y,{align:"center"});
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(16);
+    pdf.text("FICHE DE VALIDATION D'INSCRIPTION",105,y,{align:"center"});
 
     y += 15;
-
+    y += 5;
+    pdf.setDrawColor(0,102,153);
+    pdf.setLineWidth(0.5);
+    pdf.line(20,y,190,y);
+    y += 10;
     pdf.setFontSize(11);
     pdf.setFont("helvetica","normal");
 
+    pdf.setFont("helvetica","bold");
+    pdf.setTextColor(0,102,153);
     pdf.text(`Référence : INS-${inscription.numeroReference}`,15,y);
+
+    pdf.setTextColor(0,0,0);
+    pdf.setFont("helvetica","normal");
     y += 8;
 
     pdf.text(`Date : ${inscription.dateInscription}`,15,y);
@@ -1229,11 +1244,16 @@ function printInscription() {
     y += 7;
     pdf.text(`CNI : ${inscription.cni}`,15,y);
     y += 7;
+    pdf.text(`Date de naissance : ${inscription.dateNaissance}`,15,y);
+    y += 7;
     pdf.text(`Nationalité : ${inscription.nationalite}`,15,y);
     y += 7;
     pdf.text(`Email : ${inscription.email}`,15,y);
     y += 7;
     pdf.text(`Téléphone : ${inscription.telephone || 'N/A'}`,15,y);
+
+    y += 7;
+    pdf.text(`Adresse : ${inscription.adresse || 'N/A'}`,15,y);
 
     y += 15;
 
@@ -1281,15 +1301,23 @@ function printInscription() {
 
     pdf.text(modules,15,y);
 
+    y += (modules.length * 6) + 15;
+
     // Signature
-    pdf.text("Signature de l'etudiant",20,250);
-    pdf.line(20,255,80,255);
+    const signatureY = Math.max(y + 20, 220);
 
-    pdf.text("Cachet de l'administration",120,250);
-    pdf.rect(120,220,50,40);
+    pdf.text("Signature de l'etudiant",20,signatureY);
+    pdf.line(20,signatureY + 5,80,signatureY + 5);
 
-    pdf.save(`inscription-${inscription.numeroReference}.pdf`);
-}
+    pdf.text("Cachet de l'administration",120,signatureY);
+    pdf.rect(120,signatureY - 30,50,25);
+    pdf.setFontSize(8);
+pdf.text(
+    "ISPITSM Marrakech - Année Universitaire 2025-2026",
+    105,
+    290,
+    { align: "center" }
+);
 function launchConfetti() {
     const confettiCount = 50;
     const colors = ['#28a745', '#006699', '#ffc107', '#17a2b8', '#dc3545'];

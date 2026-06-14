@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ISPITSM Marrakech - Inscription &amp; Réinscription</title>
 
-<style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
 * {
     box-sizing: border-box;
 }
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f7fa;
@@ -1170,51 +1171,125 @@ function printInscription() {
     }
 }
 
-function downloadInscription() {
-    const inscription = JSON.parse(localStorage.getItem('derniere-inscription'));
+   function downloadInscription() {
 
-    if (inscription) {
-        const content = `
-CONFIRMATION D'INSCRIPTION
-ISPITSM Marrakech
-==================================================
+    const inscription = JSON.parse(
+        localStorage.getItem('derniere-inscription')
+    );
 
-NUMÉRO DE RÉFÉRENCE: #INS-${inscription.numeroReference}
-DATE D'INSCRIPTION: ${inscription.dateInscription}
-
-INFORMATIONS PERSONNELLES
-==================================================
-Nom: ${inscription.nom}
-Prénom: ${inscription.prenom}
-Email: ${inscription.email}
-Téléphone: ${inscription.telephone || 'N/A'}
-CNI: ${inscription.cni}
-Nationalité: ${inscription.nationalite}
-
-INFORMATIONS ACADÉMIQUES
-==================================================
-Filière: ${getFiliereName(inscription.filiere)}
-Option: ${inscription.option}
-Semestre: ${inscription.semestre}
-Année Universitaire: ${inscription.anneeUniversitaire}
-Type d'Inscription: ${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}
-Modules: ${inscription.modules || 'Aucun'}
-
-================================
-© 2025-2026 ISPITSM Marrakech
-        `;
-        
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `inscription-${inscription.numeroReference}.txt`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+    if (!inscription) {
+        alert('Aucune inscription trouvée');
+        return;
     }
-}
 
-// Effet Confetti
+    const { jsPDF } = window.jspdf;
+
+    const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    let y = 20;
+
+    // Cadre A4
+    pdf.setDrawColor(0,102,153);
+    pdf.rect(10,10,190,277);
+
+    // Titre
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(20);
+    pdf.text("ISPITSM Marrakech",105,20,{align:"center"});
+
+    y = 30;
+
+    pdf.setFontSize(14);
+    pdf.text("Fiche de Validation d'Inscription",105,y,{align:"center"});
+
+    y += 15;
+
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica","normal");
+
+    pdf.text(`Référence : INS-${inscription.numeroReference}`,15,y);
+    y += 8;
+
+    pdf.text(`Date : ${inscription.dateInscription}`,15,y);
+    y += 15;
+
+    pdf.setFont("helvetica","bold");
+    pdf.text("Informations Personnelles",15,y);
+
+    y += 8;
+    pdf.setFont("helvetica","normal");
+
+    pdf.text(`Nom : ${inscription.nom}`,15,y);
+    y += 7;
+    pdf.text(`Prénom : ${inscription.prenom}`,15,y);
+    y += 7;
+    pdf.text(`CNI : ${inscription.cni}`,15,y);
+    y += 7;
+    pdf.text(`Nationalité : ${inscription.nationalite}`,15,y);
+    y += 7;
+    pdf.text(`Email : ${inscription.email}`,15,y);
+    y += 7;
+    pdf.text(`Téléphone : ${inscription.telephone || 'N/A'}`,15,y);
+
+    y += 15;
+
+    pdf.setFont("helvetica","bold");
+    pdf.text("Informations Académiques",15,y);
+
+    y += 8;
+
+    pdf.setFont("helvetica","normal");
+
+    pdf.text(`Filière : ${getFiliereName(inscription.filiere)}`,15,y);
+    y += 7;
+
+    pdf.text(`Option : ${inscription.option}`,15,y);
+    y += 7;
+
+    pdf.text(`Semestre : ${inscription.semestre}`,15,y);
+    y += 7;
+
+    pdf.text(`Promotion : ${inscription.promotion}`,15,y);
+    y += 7;
+
+    pdf.text(`Année Universitaire : ${inscription.anneeUniversitaire}`,15,y);
+    y += 7;
+
+    pdf.text(
+        `Type : ${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}`,
+        15,
+        y
+    );
+
+    y += 12;
+
+    pdf.setFont("helvetica","bold");
+    pdf.text("Modules",15,y);
+
+    y += 8;
+
+    pdf.setFont("helvetica","normal");
+
+    const modules = pdf.splitTextToSize(
+        inscription.modules || "Aucun module",
+        170
+    );
+
+    pdf.text(modules,15,y);
+
+    // Signature
+    pdf.text("Signature de l'etudiant",20,250);
+    pdf.line(20,255,80,255);
+
+    pdf.text("Cachet de l'administration",120,250);
+    pdf.rect(120,220,50,40);
+
+    pdf.save(`inscription-${inscription.numeroReference}.pdf`);
+}
 function launchConfetti() {
     const confettiCount = 50;
     const colors = ['#28a745', '#006699', '#ffc107', '#17a2b8', '#dc3545'];

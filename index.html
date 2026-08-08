@@ -215,23 +215,6 @@ footer { text-align: center; padding: 20px; color: #666; margin-top: 40px; borde
                     <input type="text" id="nationalite" name="nationalite" required="" placeholder="Exemple: Marocain(e)">
                     <span class="error-message">La nationalité est obligatoire</span>
                 </div>
-                <div class="form-group">
-                    <label for="email" class="required">Email</label>
-                    <input type="email" id="email" name="email" required="" placeholder="exemple@email.com">
-                    <span class="error-message">Veuillez entrer une adresse email valide</span>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="telephone">Téléphone</label>
-                    <input type="tel" id="telephone" name="telephone" placeholder="Exemple: +212612345678" pattern="[+0-9\s\-()]{8,}">
-                    <span class="error-message">Veuillez entrer un numéro de téléphone valide</span>
-                </div>
-                <div class="form-group">
-                    <label for="adresse">Adresse</label>
-                    <input type="text" id="adresse" name="adresse" placeholder="Votre adresse complète">
-                </div>
             </div>
         </div>
 
@@ -336,7 +319,7 @@ footer { text-align: center; padding: 20px; color: #666; margin-top: 40px; borde
         <div class="modal-icon success" id="modalIcon">✓</div>
         <div class="modal-title" id="modalTitle">Inscription Confirmée</div>
         <div class="modal-message" id="modalMessage">Votre inscription a été enregistrée avec succès!</div>
-        <div class="modal-subtext" id="modalSubtext">Un email de confirmation vous sera envoyé à votre adresse</div>
+        <div class="modal-subtext" id="modalSubtext">Conservez votre numéro de référence pour le suivi</div>
         <div class="modal-reference">
             <div class="modal-reference-label">Numéro de Référence</div>
             <div class="modal-reference-number" id="referenceNumber">#INS-000000</div>
@@ -355,12 +338,8 @@ footer { text-align: center; padding: 20px; color: #666; margin-top: 40px; borde
 </footer>
 
 <script>
-// ==========================================
-// REMPLACEZ CECI PAR VOTRE URL GOOGLE SCRIPT
-// ==========================================
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxbdKvm0IX7vW3AIN4RClk95hz4wGnCcMEVs5wEj3121A9xUywz8J9e0p0NdTnE8rc/exec'; 
 
-// Classe pour gérer les messages
 class MessageManager {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
@@ -424,32 +403,20 @@ function validateForm() {
             isValid = false;
             errors.push(`${field.previousElementSibling.textContent.replace(' *', '')}`);
         } else {
-            if (field.type === 'email' && !isValidEmail(field.value)) { formGroup.classList.add('error'); isValid = false; errors.push('Email invalide'); } 
-            else if (field.type === 'date' && !isValidDate(field.value)) { formGroup.classList.add('error'); isValid = false; errors.push('Date invalide'); } 
+            if (field.type === 'date' && !isValidDate(field.value)) { formGroup.classList.add('error'); isValid = false; errors.push('Date invalide'); } 
             else if (field.id === 'cni' && !isValidCNI(field.value)) { formGroup.classList.add('error'); isValid = false; errors.push('CNI invalide'); } 
             else if (field.id === 'promotion' && !isValidYear(field.value)) { formGroup.classList.add('error'); isValid = false; errors.push('Année invalide'); } 
             else { formGroup.classList.remove('error'); }
         }
     });
     
-    const telephone = document.getElementById('telephone');
-    if (telephone.value.trim() && !isValidPhone(telephone.value)) {
-        telephone.closest('.form-group').classList.add('error');
-        isValid = false;
-        errors.push('Téléphone invalide');
-    }
     return { isValid, errors };
 }
 
-function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 function isValidDate(dateString) { const date = new Date(dateString); return date instanceof Date && !isNaN(date) && date < new Date(); }
 function isValidCNI(cni) { return cni.length >= 6; }
 function isValidYear(year) { const currentYear = new Date().getFullYear(); return /^[0-9]{4}$/.test(year) && year >= 1950 && year <= currentYear; }
-function isValidPhone(phone) { return /^[+0-9\s\-()]{8,}$/.test(phone); }
 
-// ==========================================
-// NOUVEAU : ENVOI VERS GOOGLE SHEET
-// ==========================================
 form.addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -457,23 +424,21 @@ form.addEventListener('submit', function(e) {
     const validation = validateForm();
     
     if (validation.isValid) {
-        // Message de chargement
         const loadingMsgId = messageManager.info('⏳ Traitement', 'Envoi de votre inscription en cours...');
         
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
         
-        // Requête vers Google Apps Script
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             body: formData
         })
         .then(response => response.json())
         .then(res => {
-            messageManager.remove(loadingMsgId); // Supprimer le message de chargement
+            messageManager.remove(loadingMsgId);
             
             if (res.result === 'success') {
-                showSuccessModal(data); // Afficher le modal et les confettis
+                showSuccessModal(data);
             } else {
                 throw new Error(res.error || 'Erreur inconnue');
             }
@@ -507,9 +472,7 @@ function showSuccessModal(data) {
         <div class="modal-detail-item"><span class="modal-detail-label">🎯 Option:</span><span class="modal-detail-value">${data.option}</span></div>
         <div class="modal-detail-item"><span class="modal-detail-label">📚 Semestre:</span><span class="modal-detail-value">${data.semestre}</span></div>
         <div class="modal-detail-item"><span class="modal-detail-label">📝 Type :</span><span class="modal-detail-value">${data.type === 'inscription' ? 'Première inscription' : 'Réinscription'}</span></div>
-        <div class="modal-detail-item"><span class="modal-detail-label">✉️ Email:</span><span class="modal-detail-value">${data.email}</span></div>
         <div class="modal-detail-item"><span class="modal-detail-label">🎂 Date de naissance :</span><span class="modal-detail-value">${data.dateNaissance || 'N/A'}</span></div>
-        <div class="modal-detail-item"><span class="modal-detail-label">🏠 Adresse :</span><span class="modal-detail-value">${data.adresse || 'N/A'}</span></div>
         <div class="modal-detail-item"><span class="modal-detail-label">📅 Date:</span><span class="modal-detail-value">${new Date().toLocaleDateString('fr-FR')}</span></div>
         <div class="modal-detail-item"><span class="modal-detail-label">📖 Modules :</span><span class="modal-detail-value">${data.modules || 'Aucun'}</span></div>
     `;
@@ -518,7 +481,7 @@ function showSuccessModal(data) {
     modalOverlay.style.display = 'block';
     launchConfetti();
     
-    messageManager.success('🎉 Inscription Réussie!', 'Vérifiez votre email pour les prochaines étapes.', `Numéro de référence: <strong>#INS-${refNumber}</strong>`);
+    messageManager.success('🎉 Inscription Réussie!', 'Conservez votre numéro de référence pour le suivi.', `Numéro de référence: <strong>#INS-${refNumber}</strong>`);
     saveInscriptionData(data, refNumber);
 }
 
@@ -535,42 +498,509 @@ function saveInscriptionData(data, refNumber) {
 
 function closeModal() { modalOverlay.style.display = 'none'; form.reset(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
+// ==========================================
+// FONCTION D'IMPRESSION PROFESSIONNELLE
+// ==========================================
 function printInscription() {
     const inscription = JSON.parse(localStorage.getItem('derniere-inscription'));
-    if (inscription) {
-        const printContent = `
-            <!DOCTYPE html><html><head><style>
-                body { font-family: Arial, sans-serif; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h1 { color: #006699; }
-                .reference { background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-                .details { margin-top: 20px; }
-                .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }
-            </style></head><body>
-                <div class="header"><h1>ISPITSM Marrakech</h1><p>Confirmation d'Inscription</p></div>
-                <div class="reference"><p><strong>Numéro de Référence:</strong> #INS-${inscription.numeroReference}</p><p><strong>Date d'Inscription:</strong> ${inscription.dateInscription}</p></div>
-                <div class="details">
-                    <h3>Informations Personnelles</h3>
-                    <div class="detail-row"><span>Nom:</span><span>${inscription.nom}</span></div>
-                    <div class="detail-row"><span>Prénom:</span><span>${inscription.prenom}</span></div>
-                    <div class="detail-row"><span>Email:</span><span>${inscription.email}</span></div>
-                    <div class="detail-row"><span>Téléphone:</span><span>${inscription.telephone || 'N/A'}</span></div>
-                    <div class="detail-row"><span>Date de naissance :</span><span>${inscription.dateNaissance || 'N/A'}</span></div>
-                    <div class="detail-row"><span>Adresse :</span><span>${inscription.adresse || 'N/A'}</span></div>
-                    <h3>Informations Académiques</h3>
-                    <div class="detail-row"><span>Filière:</span><span>${getFiliereName(inscription.filiere)}</span></div>
-                    <div class="detail-row"><span>Option:</span><span>${inscription.option}</span></div>
-                    <div class="detail-row"><span>Semestre:</span><span>${inscription.semestre}</span></div>
-                    <div class="detail-row"><span>Type:</span><span>${inscription.type === 'inscription' ? 'Première inscription' : 'Réinscription'}</span></div>
-                    <div class="detail-row"><span>Modules :</span><span>${inscription.modules || 'Aucun'}</span></div>
-                </div>
-            </body></html>
-        `;
-        const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-        printWindow.print();
+    if (!inscription) {
+        messageManager.warning('⚠ Aucune donnée', 'Aucune inscription trouvée à imprimer.');
+        return;
     }
+
+    // Formater la date de naissance
+    let dateNaissFormatee = 'N/A';
+    if (inscription.dateNaissance) {
+        const d = new Date(inscription.dateNaissance);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateNaissFormatee = d.toLocaleDateString('fr-FR', options);
+    }
+
+    // Date d'impression
+    const dateImpression = new Date();
+    const optionsImpression = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const dateImpressionFormatee = dateImpression.toLocaleDateString('fr-FR', optionsImpression);
+
+    // Type d'inscription formaté
+    const typeInscription = inscription.type === 'inscription' ? 'Première Inscription' : 'Réinscription';
+
+    // Modules formatés en liste
+    const modulesListe = inscription.modules
+        ? inscription.modules.split(',').map(m => m.trim()).filter(m => m).map(m => `<li style="margin-bottom:4px;padding-left:8px;">${m}</li>`).join('')
+        : '<li>Aucun module spécifié</li>';
+
+    const printContent = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche d'Inscription - ISPITSM Marrakech</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 15mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11pt;
+            color: #222;
+            line-height: 1.5;
+            background: white;
+        }
+
+        /* === BANDEAU EN-TÊTE === */
+        .header-band {
+            background: linear-gradient(135deg, #006699 0%, #003d5c 100%);
+            color: white;
+            padding: 22px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 0;
+        }
+
+        .header-band .left h1 {
+            font-size: 20pt;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .header-band .left p {
+            font-size: 10pt;
+            opacity: 0.85;
+            font-weight: 300;
+        }
+
+        .header-band .right {
+            text-align: right;
+        }
+
+        .header-band .right .doc-type {
+            font-size: 14pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-band .right .year {
+            font-size: 10pt;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        /* === BANDEAU REFERENCE === */
+        .ref-band {
+            background: #004d73;
+            color: white;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10pt;
+        }
+
+        .ref-band .ref-label {
+            opacity: 0.8;
+        }
+
+        .ref-band .ref-number {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 12pt;
+            letter-spacing: 1px;
+            background: rgba(255,255,255,0.15);
+            padding: 3px 14px;
+            border-radius: 4px;
+        }
+
+        /* === CONTENU PRINCIPAL === */
+        .content {
+            padding: 25px 30px;
+        }
+
+        .section-title {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #006699;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            margin-top: 25px;
+            border-bottom: 2.5px solid #006699;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .section-title .icon {
+            font-size: 14pt;
+        }
+
+        /* === TABLEAU DE DONNÉES === */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .data-table tr {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            vertical-align: top;
+        }
+
+        .data-table .label-cell {
+            width: 200px;
+            font-weight: 700;
+            color: #004d73;
+            background: #f0f7fb;
+            border-right: 1px solid #d4e6f1;
+            font-size: 10pt;
+        }
+
+        .data-table .value-cell {
+            color: #333;
+            font-size: 10.5pt;
+        }
+
+        /* === BADGE TYPE === */
+        .badge {
+            display: inline-block;
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-inscription {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #28a745;
+        }
+
+        .badge-reinscription {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #17a2b8;
+        }
+
+        /* === MODULES === */
+        .modules-box {
+            background: #f9fbfd;
+            border: 1px solid #d4e6f1;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 5px 12px 10px 12px;
+        }
+
+        .modules-box ul {
+            margin: 0;
+            padding-left: 18px;
+            list-style-type: square;
+            color: #006699;
+        }
+
+        .modules-box li {
+            color: #333;
+            font-size: 10pt;
+        }
+
+        /* === ENCADRÉ IMPORTANT === */
+        .notice-box {
+            background: #fff8e1;
+            border: 1.5px solid #ffc107;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-top: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .notice-box .notice-icon {
+            font-size: 16pt;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .notice-box .notice-text {
+            font-size: 9.5pt;
+            color: #664d03;
+            line-height: 1.6;
+        }
+
+        .notice-box .notice-text strong {
+            color: #856404;
+        }
+
+        /* === SIGNATURES === */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 45px;
+            padding: 0 20px;
+        }
+
+        .signature-block {
+            text-align: center;
+            width: 42%;
+        }
+
+        .signature-line {
+            border-top: 1.5px solid #333;
+            width: 100%;
+            margin-top: 55px;
+            margin-bottom: 8px;
+        }
+
+        .signature-label {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .signature-sub {
+            font-size: 8.5pt;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* === PIED DE PAGE === */
+        .footer-band {
+            margin-top: 30px;
+            border-top: 2px solid #006699;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 8pt;
+            color: #999;
+        }
+
+        .footer-band .left {
+            max-width: 60%;
+        }
+
+        .footer-band .right {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            color: #bbb;
+            font-size: 7.5pt;
+        }
+
+        /* === FILIGRANE === */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-size: 80pt;
+            font-weight: 900;
+            color: rgba(0, 102, 153, 0.03);
+            letter-spacing: 15px;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 0;
+        }
+
+        /* === IMPRESSION === */
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .watermark { display: block; }
+        }
+
+        @media screen {
+            .watermark { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="watermark">ISPITSM</div>
+
+    <!-- EN-TÊTE -->
+    <div class="header-band">
+        <div class="left">
+            <h1>ISPITSM MARRAKECH</h1>
+            <p>Institut Supérieur des Professions Infirmières et Techniques de Santé de Marrakech</p>
+        </div>
+        <div class="right">
+            <div class="doc-type">Fiche d'Inscription</div>
+            <div class="year">Année Universitaire ${inscription.anneeUniversitaire || '2025-2026'}</div>
+        </div>
+    </div>
+
+    <div class="ref-band">
+        <span class="ref-label">Référence :</span>
+        <span class="ref-number">#INS-${inscription.numeroReference}</span>
+        <span class="ref-label">Date : ${dateImpressionFormatee}</span>
+    </div>
+
+    <!-- CONTENU -->
+    <div class="content">
+
+        <!-- IDENTITÉ -->
+        <div class="section-title"><span class="icon">📋</span> Identité de l'Étudiant(e)</div>
+        <table class="data-table">
+            <tr>
+                <td class="label-cell">Nom complet</td>
+                <td class="value-cell" style="font-size:12pt;font-weight:600;">${inscription.nom.toUpperCase()} ${inscription.prenom}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Numéro CNI</td>
+                <td class="value-cell" style="font-family:'Courier New',monospace;letter-spacing:1px;">${inscription.cni}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Date de naissance</td>
+                <td class="value-cell">${dateNaissFormatee}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Nationalité</td>
+                <td class="value-cell">${inscription.nationalite}</td>
+            </tr>
+        </table>
+
+        <!-- PARCOURS ACADÉMIQUE -->
+        <div class="section-title"><span class="icon">🎓</span> Parcours Académique</div>
+        <table class="data-table">
+            <tr>
+                <td class="label-cell">Filière</td>
+                <td class="value-cell">${getFiliereName(inscription.filiere)}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Option</td>
+                <td class="value-cell">${inscription.option}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Semestre</td>
+                <td class="value-cell">${inscription.semestre}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Promotion</td>
+                <td class="value-cell">${inscription.promotion}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Année Universitaire</td>
+                <td class="value-cell">${inscription.anneeUniversitaire || '2025-2026'}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Type d'inscription</td>
+                <td class="value-cell">
+                    <span class="badge ${inscription.type === 'inscription' ? 'badge-inscription' : 'badge-reinscription'}">${typeInscription}</span>
+                </td>
+            </tr>
+        </table>
+
+        <!-- MODULES -->
+        <div class="section-title"><span class="icon">📚</span> Modules Suivis</div>
+        <div class="modules-box">
+            <ul>${modulesListe}</ul>
+        </div>
+
+        <!-- AVIS IMPORTANT -->
+        <div class="notice-box">
+            <span class="notice-icon">⚠️</span>
+            <div class="notice-text">
+                <strong>Avis important :</strong> Cette fiche constitue un accusé de réception de votre inscription en ligne.
+                Elle ne remplace en aucun cas l'inscription officielle qui se fait auprès du secrétariat de l'établissement.
+                Veuillez vous présenter avec ce document ainsi que les pièces justificatives requises pour finaliser votre inscription.
+                La présente fiche est valable jusqu'à la date de clôture des inscriptions fixée par l'administration.
+            </div>
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="signatures">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-label">Signature de l'Étudiant(e)</div>
+                <div class="signature-sub">Nom : ${inscription.nom} ${inscription.prenom}</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-label">Cachet & Signature du Service</div>
+                <div class="signature-sub">ISPITSM Marrakech</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIED DE PAGE -->
+    <div class="footer-band">
+        <div class="left">
+            ISPITSM Marrakech — Institut Supérieur des Professions Infirmières et Techniques de Santé de Marrakech<br>
+            Ce document est généré automatiquement par la plateforme d'inscription en ligne.
+        </div>
+        <div class="right">
+            REF: #INS-${inscription.numeroReference}<br>
+            IMPRIMÉ LE: ${dateImpression.toLocaleDateString('fr-FR')}
+        </div>
+    </div>
+
+    <!-- BOUTON RETOUR (écran uniquement) -->
+    <div class="no-print" style="text-align:center;margin:25px 0;">
+        <button onclick="window.print()" style="
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #006699 0%, #004d73 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12pt;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        ">🖨 Cliquez ici pour imprimer</button>
+        <button onclick="window.close()" style="
+            padding: 12px 30px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 11pt;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 12px;
+        ">Fermer</button>
+    </div>
+
+</body>
+</html>`;
+
+    const printWindow = window.open('', '_blank', 'height=900,width=800,scrollbars=yes');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Lancer l'impression après le chargement complet des styles
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+        }, 400);
+    };
 }
 
 function downloadInscription() {
@@ -588,12 +1018,9 @@ INFORMATIONS PERSONNELLES
 ==================================================
 Nom: ${inscription.nom}
 Prénom: ${inscription.prenom}
-Email: ${inscription.email}
-Date de naissance: ${inscription.dateNaissance || 'N/A'}
-Adresse: ${inscription.adresse || 'N/A'}
-Téléphone: ${inscription.telephone || 'N/A'}
 CNI: ${inscription.cni}
 Nationalité: ${inscription.nationalite}
+Date de naissance: ${inscription.dateNaissance || 'N/A'}
 
 INFORMATIONS ACADÉMIQUES
 ==================================================
@@ -637,7 +1064,6 @@ form.querySelectorAll('input, select, textarea').forEach(field => {
     field.addEventListener('blur', function() {
         const formGroup = this.closest('.form-group');
         if (this.hasAttribute('required') && !this.value.trim()) { formGroup.classList.add('error'); } 
-        else if (this.type === 'email' && this.value.trim() && !isValidEmail(this.value)) { formGroup.classList.add('error'); } 
         else { formGroup.classList.remove('error'); }
     });
     field.addEventListener('focus', function() { this.closest('.form-group').classList.remove('error'); });
